@@ -1,7 +1,11 @@
 *.yml
+!config.yml
+!.github/workflows/*.yml
+.env
 **/__pycache__
 /engines/*
 !/engines/README.md
+/chessgame/
 lichess_bot_auto_logs/*
 .vscode/*
 .vs/*

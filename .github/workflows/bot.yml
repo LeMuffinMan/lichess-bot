@@ -1,0 +1,53 @@
+name: LeMuffinBot
+
+on:
+  schedule:
+    - cron: '0 */5 * * *'   # redémarre toutes les 5h (limite GH Actions = 6h)
+  workflow_dispatch:          # déclenchement manuel
+
+jobs:
+  run-bot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 290      # marge avant la limite de 6h
+
+    steps:
+      - name: Checkout lichess-bot
+        uses: actions/checkout@v4
+
+      - name: Checkout ChessGame (engine source)
+        uses: actions/checkout@v4
+        with:
+          repository: LeMuffinMan/ChessGame
+          path: chessgame
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache engine binary
+        id: cache-engine
+        uses: actions/cache@v4
+        with:
+          path: engines/uci
+          key: engine-${{ hashFiles('chessgame/Cargo.lock') }}
+
+      - name: Build engine
+        if: steps.cache-engine.outputs.cache-hit != 'true'
+        run: |
+          cd chessgame
+          cargo build --release --bin uci
+          mkdir -p ../engines
+          cp target/release/uci ../engines/uci
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run bot
+        env:
+          LICHESS_BOT_TOKEN: ${{ secrets.LICHESS_BOT_TOKEN }}
+        run: python lichess-bot.py
