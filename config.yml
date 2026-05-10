@@ -200,7 +200,7 @@ matchmaking:
   allow_matchmaking: true # Set it to 'true' to challenge other bots.
   allow_during_games: false # Set it to 'true' to create challenges during long games.
   challenge_variant: "standard"
-  challenge_timeout: 30 # Create a challenge after being idle for 'challenge_timeout' minutes. The minimum is 1 minute.
+  challenge_timeout: 3 # Create a challenge after being idle for 'challenge_timeout' minutes. The minimum is 1 minute.
   challenge_initial_time: # Initial time in seconds of the challenge (to be chosen at random).
     - 60
     - 180
@@ -217,7 +217,10 @@ matchmaking:
   rating_preference: "none" # One of "none", "high", "low".
   challenge_mode: "rated" # Set it to the mode in which challenges are sent. Possible options are 'casual', 'rated' and 'random'.
   challenge_filter: coarse # If a bot declines a challenge, do not issue a similar challenge to that bot. Possible options are 'none', 'coarse', and 'fine'.
-  # block_list:                      # The list of bots that will not be challenged
+  block_list:                      # The list of bots that will not be challenged
+    - RadianceEngine
+    - Demolito_L6
+    - AshNostromo
   #   - user1
   #   - user2
   # online_block_list:               # The urls from which to retrieve a list of bot names that will not be challenged. The list should be a text file where each line contains the name of a blocked bot

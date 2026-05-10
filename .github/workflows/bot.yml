@@ -34,7 +34,7 @@ jobs:
         if: steps.cache-engine.outputs.cache-hit != 'true'
         run: |
           cd chessgame
-          cargo build --release --bin uci
+          cargo build --release --features=native --bin uci
           mkdir -p ../engines
           cp target/release/uci ../engines/uci
 
