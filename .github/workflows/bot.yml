@@ -5,6 +5,9 @@ on:
     - cron: '0 */5 * * *'   # redémarre toutes les 5h (limite GH Actions = 6h)
   workflow_dispatch:          # déclenchement manuel
 
+permissions:
+  contents: write
+
 jobs:
   run-bot:
     runs-on: ubuntu-latest
@@ -13,6 +16,16 @@ jobs:
     steps:
       - name: Checkout lichess-bot
         uses: actions/checkout@v4
+
+      - name: Keepalive commit (avoid 60-day schedule auto-disable)
+        run: |
+          mkdir -p .github
+          date -u +%Y-%m-%dT%H:%M:%SZ > .github/keepalive.txt
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add .github/keepalive.txt
+          git diff --cached --quiet || git commit -m "chore: keepalive"
+          git push
 
       - name: Checkout ChessGame (engine source)
         uses: actions/checkout@v4
