@@ -23,15 +23,7 @@ jobs:
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
 
-      - name: Cache engine binary
-        id: cache-engine
-        uses: actions/cache@v4
-        with:
-          path: engines/uci
-          key: engine-${{ hashFiles('chessgame/Cargo.lock') }}
-
       - name: Build engine
-        if: steps.cache-engine.outputs.cache-hit != 'true'
         run: |
           cd chessgame
           cargo build --release --features=native --bin uci
