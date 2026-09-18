@@ -56,4 +56,9 @@ jobs:
       - name: Run bot
         env:
           LICHESS_BOT_TOKEN: ${{ secrets.LICHESS_BOT_TOKEN }}
-        run: python lichess-bot.py
+        run: |
+          python lichess-bot.py &
+          BOT_PID=$!
+          sleep 14400
+          kill -INT $BOT_PID
+          wait $BOT_PID
