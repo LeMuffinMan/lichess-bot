@@ -1,8 +1,12 @@
 name: LeMuffinBot
 
+concurrency:
+  group: lichess-bot
+  cancel-in-progress: false
+
 on:
   schedule:
-    - cron: '0 */5 * * *'   # redémarre toutes les 5h (limite GH Actions = 6h)
+    - cron: '0 * * * *'     # un job par heure, mis en attente tant que le précédent joue
   workflow_dispatch:          # déclenchement manuel
 
 permissions:
@@ -59,6 +63,17 @@ jobs:
         run: |
           python lichess-bot.py &
           BOT_PID=$!
-          sleep 14400
-          kill -INT $BOT_PID
-          wait $BOT_PID
+          ENGINE_SHA=$(git -C chessgame rev-parse HEAD)
+          for _ in $(seq 240); do
+            sleep 60
+            if ! kill -0 "$BOT_PID" 2>/dev/null; then
+              break
+            fi
+            LATEST=$(git ls-remote https://github.com/LeMuffinMan/ChessGame.git main | cut -f1 || true)
+            if [ -n "$LATEST" ] && [ "$LATEST" != "$ENGINE_SHA" ]; then
+              echo "engine moved to $LATEST, stopping after the current games"
+              break
+            fi
+          done
+          kill -INT "$BOT_PID" 2>/dev/null || true
+          wait "$BOT_PID" || true
